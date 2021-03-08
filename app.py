@@ -3,6 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output, State
+import plotly.express as px
 import pandas as pd
 import pickle
 
@@ -13,9 +14,17 @@ server = app.server
 app.title='knn'
 
 ########### Read in the dataset ######
-train=pd.read_pickle('resources/train.pkl')
-
+train= pd.read_pickle('resources/train.pkl')
+cust_dff= pd.read_csv('resources/Cust_df.csv')
 ########### Set up the layout
+myfig = px.line(
+    y= cust_dff['Customer Count'] , # name used in legend and hover labels
+    x=cust_dff['Date'],labels={'y':'No. Customers','x':"Date" })
+
+myfig.update_layout(
+    title_text='Active Customer Report', # title of plot
+    xaxis_tickangle=-45,xaxis_title_text='Date', 
+    yaxis_title_text='Number of Customers')
 
 app.layout = html.Div(children=[
     html.H1('Classification of Iris Flowers'),
@@ -63,11 +72,7 @@ app.layout = html.Div(children=[
                 dcc.Graph(id='figure-1')
             ], className='six columns'),
             html.Div([
-                html.Img(src=app.get_asset_url('iris_petal_sepal.png'), style={'width': 'auto', 'height': '275px'}),
-            ], style={'textAlign': 'center',
-                    'padding-top': '100px',
-                    'vertical-align': 'middle'},
-            className='six columns'),
+            dcc.Graph(id='figure-2',figure = myfig)
         ], className='twelve columns'),
     html.Br(),
     html.A('Code on Github', href='https://github.com/austinlasseter/knn_iris_plotly'),
